@@ -1,0 +1,158 @@
+﻿<!DOCTYPE HTML>
+<html ng-app="metalApp">
+	<head>
+		<title>MeTAL - My e-Trading Adapters Library - Order Entry</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+		<script src="js/angular.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script src="js/jquery-ui.min.js" type="text/javascript"></script>
+		<script src="js/jquery.dropotron.min.js" type="text/javascript"></script>
+		<script src="js/jquery.scrollgress.min.js" type="text/javascript"></script>
+		<script src="js/skel.min.js" type="text/javascript"></script>
+		<script src="js/skel-layers.min.js" type="text/javascript"></script>
+		<script src="js/init.js" type="text/javascript"></script>
+		<script src="js/metal.js" type="text/javascript"></script>
+		<script src="js/controller.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-wide.css" />
+		</noscript>
+		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+	</head>
+	<body class="bodyLibrary" ng-controller="MetalCtrl">
+
+		<!-- Header -->
+			<header id="header">
+				<nav id="nav">
+					<ul>
+						<!-- <li><a href="index.html">Home</a></li>
+						<li><a href="library.html">Library</a></li>
+						<li><a href="#">Quickstart</a></li> -->
+						<li class="current"><a href="#">Enter an order</a></li>
+						<!-- <li><a href="#" class="button">Download MeTAL</a></li> -->
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Main -->
+			<section id="main" class="container orderEntry">
+				<header>
+					<h2>Enter an order</h2>
+					<p>The simplest and fastest interface for exchange interaction.</p>
+				</header>
+				<div class="box">
+					<form method="post" action="#" name="OrderForm">
+
+						<div class="boxVide">
+							<div class="row uniform half collapse-at-2">
+								<div class="6u">
+									<input type="radio" id="chooseBuy" name="choose" value="1" ng-model="model.Side" onchange="buySellChanged('chooseBuy');">
+									<label class="chooseBuy" for="chooseBuy">Buy</label>
+								</div>
+								<div class="6u">
+									<input type="radio" id="chooseSell" name="choose" value="2" ng-model="model.Side" onchange="buySellChanged('chooseSell')">
+									<label class="chooseSell" for="chooseSell">Sell</label>
+								</div>
+							</div>
+						</div>
+
+						<div id="boxBuySell" class="box boxBuySell">
+							<div class="row uniform half collapse-at-2">
+								<label for="quantity" class="6u">
+									Quantity
+									<input type="number" name="OrderQty" id="quantity" ng-model="model.OrderQty" placeholder="000" min="0"/>
+								</label>
+								<label for="price" class="6u">
+									Price
+									<input type="number" name="Price" id="price" ng-model="model.Price" placeholder="000.00" min="0" step="0.01" />
+								</label>
+							</div>
+							<div class="row uniform half">
+								<label for="symbol" class="12u">
+									Symbol
+									<input type="text" name="Symbol" id="symbol" ng-model="model.Symbol" placeholder="-"/>
+								</label>
+							</div>
+						</div>
+						<div class="row uniform half collapse-at-3">
+							<div class="4u"> 
+								&nbsp;
+							</div>
+							<div class="4u"> 
+								<ul class="actions align-center fit">
+									<li>
+										<a href="#boxResult"  id="buttonBuySell" class="button alternate fit disabled" ng-click="submitform()">
+											<span id="iconBuySell" class="icon fa-exchange"> &nbsp; </span>
+											Side
+										</a>
+									</li>
+								</ul>
+							</div>
+							<div class="4u"> 
+								&nbsp;
+							</div>
+						</div>
+
+					</form>
+				</div>
+
+				<div id="boxResult" ng-class="{'box':true, 'boxResultShow':status.length > 0, 'boxResultHidden':status.length == 0}">
+					<div class="row">
+						<div class="12u">
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<td class="align-center">&nbsp;</td>
+												<td class="align-center">Status</td>
+												<td class="align-center">Side</td>
+												<td class="align-right">Quantity</td>
+												<td class="align-left">Symbol</td>
+												<td>&nbsp</td>
+												<td class="align-left">Price</td>
+												<td class="align-center">Order Id</td>
+												<td class="align-center">Exec Id</td>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="st in status">
+												<td class="align-center image-center"><img ng-src="images/{{st.source}}.png"/></td>
+												<td class="align-center"><i class="icon" ng-class="{'fa-times': st.OrdStatus == 8, 'fa-check': st.OrdStatus != 8}"></i></td>
+												<td class="align-center"><span ng-class="{'colBuy': st.Side == 1, 'colSell': st.Side != 1}">{{st.Side == 1 ? 'B' : 'S'}}</span></td>
+												<td class="align-right">{{st.LastQty}}</td>
+												<td>{{st.Symbol}}</td>
+												<td>@</td>
+												<td class="align-left">{{st.LastPx}}</td>
+												<td class="align-center">{{st.OrderID}}</td>
+												<td class="align-center">{{st.ExecID}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+				</div>
+			</section>
+			
+		<!-- Footer -->
+			<footer id="footer">
+				<ul class="icons">
+					<li><a href="#" class="icon fa-university"><span class="label">Bourse</span></a></li>
+				</ul>
+				<ul class="copyright">
+					<li>MISYS Paris Hackathon 2014</li><li>Cédric, Christian, JC, Philippe, <a href="https://twitter.com/yoanmaman" alt="Yoan's Twitter">Yoan</a></li><li>MeTAL Team</li>
+				</ul>
+			</footer>
+
+	</body>
+
+<!--
+	Alpha by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+</html>
