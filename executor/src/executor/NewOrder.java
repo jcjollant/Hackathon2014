@@ -17,4 +17,9 @@ public abstract class NewOrder extends Message {
 	public String clOrdID;
 	public byte side;
 	public int quantity;
+	
+	@Override
+	public boolean isNewOrder() {
+		return true;
+	}
 }

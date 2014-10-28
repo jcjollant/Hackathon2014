@@ -130,6 +130,7 @@ public class Message {
 
 		return position + size;
 	}
+	
 //	public int encode( String val, int position, int size) { 
 //		String subString;
 //		if( val.length() > size) {
@@ -154,4 +155,12 @@ public class Message {
 	
 	private Endianness endiannes;
 	private int size;
+	
+	public boolean isNewOrder() {
+		return false;
+	}
+
+	public boolean isLogon() {
+		return false;
+	}
 }

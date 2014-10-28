@@ -12,14 +12,18 @@ public abstract class Exchange extends Thread {
 		this.port = port;
 		this.executionReport = er;
 		this.newOrder = no;
+		this.serverSocket = null;
+	}
+
+	protected void finalize() throws Throwable {
+		if( this.serverSocket != null) this.serverSocket.close();
 	}
 	
 	@Override
 	public void run() {
 		
-		ServerSocket socket = null;
 		try {
-			socket = new ServerSocket( this.port);
+			this.serverSocket = new ServerSocket( this.port);
 		} catch( IOException ioe) {
 			System.out.println( "Could not create " + this.name + " server socket because " + ioe.getMessage());
 			return;
@@ -28,9 +32,9 @@ public abstract class Exchange extends Thread {
 		// this loop if for all connections
 		while( true) {
 			Socket clientSocket = null;
-			System.out.println( "Listenning for " + this.name + " incomming connections on " + socket.getLocalPort() + ". Thread ID=" + Thread.currentThread().getId());
+			System.out.println( "Listenning for " + this.name + " incomming connections on " + this.serverSocket.getLocalPort() + ". Thread ID=" + Thread.currentThread().getId());
 			try {
-				clientSocket = socket.accept();
+				clientSocket = this.serverSocket.accept();
 			} catch( IOException ioe) {
 				System.out.println( "Could not accept connection because " + ioe.getMessage());
 				return;
@@ -48,42 +52,56 @@ public abstract class Exchange extends Thread {
 				continue;
 			}
 			
+
+			Message msg = null;
+			Message response = null;
 			
 			while( true) { // this is the incomming orders loop
 				try {
 					byte inputBuffer[] = new byte[1024];
 					int bufferSize = 0;
 					while( ( bufferSize += is.read( inputBuffer)) != -1 ) {
-						// System.out.println( this.name + " received " + bufferSize + " bytes");
-						if( bufferSize >= this.newOrder.getSize()) {
+						// do we have enough to read the full message?
+						if( ( msg = this.getMessage( inputBuffer, bufferSize)) == null) continue;
+						
+						// copy remainder to the beginning of the buffer
+						System.arraycopy( inputBuffer, msg.getSize(), inputBuffer, 0, bufferSize - msg.getSize());
+						bufferSize -= msg.getSize();
+						
+						// send proper response
+						if( msg.isNewOrder()) {
+							
 							System.out.println( this.name + " Received New Order (" + bufferSize + " bytes)");
 							this.newOrder.decode( inputBuffer);
 							System.out.println( this.name + " Order: " + this.newOrder.toString());
 							System.out.println( Display.bytesToHex( inputBuffer, bufferSize));
 							
-							// copy remainder to the beginning of the buffer
-							System.arraycopy( inputBuffer, this.newOrder.getSize(), inputBuffer, 0, bufferSize - this.newOrder.getSize());
 							try {
 								this.executionReport.populate( this.newOrder);
 								this.executionReport.encode();
 							} catch( Exception e) {
 								System.out.println( "Could not encode response because " + e.getMessage());
 							}
-							bufferSize -= this.newOrder.getSize();
-							
+						} else if( msg.isLogon()) {
+							response = msg;
+						}
+						
+						if( response != null) {
 							// send the response
 							try {
-								byte bb[] = this.executionReport.getBytes();
+								byte bb[] = response.getBytes();
 								os.write( bb);
-								System.out.println( this.name + " Sent Execution Report (" + bb.length + " bytes)");
-								System.out.println( this.name + " ExecutionReport: " + this.executionReport.toString());
+								System.out.println( this.name + " Sent Response (" + bb.length + " bytes)");
+								System.out.println( this.name + " Message: " + this.executionReport.toString());
 								System.out.println( Display.bytesToHex(bb, bb.length));
 								Thread.sleep( 1000);
 								clientSocket.close();
+								response = null;
 							} catch(IOException ioe) {
 								System.out.println("Could not send response because " + ioe.getMessage());
 								break;
 							}
+							
 						}
 					}
 				} catch( Exception e) {
@@ -96,9 +114,13 @@ public abstract class Exchange extends Thread {
 		}
 	}
 
+	abstract Message getMessage(byte[] inputBuffer, int bufferSize);
+
+	abstract int getHeaderSize();
+
 	private String name;
 	private int port;
 	private ExecutionReport executionReport;
-	private NewOrder newOrder;
-	
+	protected NewOrder newOrder;
+	private ServerSocket serverSocket;
 }
