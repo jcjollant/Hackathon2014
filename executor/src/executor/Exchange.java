@@ -7,10 +7,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class Exchange extends Thread {
-	public Exchange( String name, int port, ExecutionReport er, NewOrder no) {
+	public Exchange( String name, int port) {
 		this.name = name;
 		this.port = port;
-		this.newOrder = no;
 		this.serverSocket = null;
 	}
 
@@ -102,6 +101,5 @@ public abstract class Exchange extends Thread {
 
 	private String name;
 	private int port;
-	protected NewOrder newOrder;
 	private ServerSocket serverSocket;
 }

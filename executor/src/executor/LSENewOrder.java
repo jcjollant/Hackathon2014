@@ -1,14 +1,14 @@
 package executor;
 
-public class LSENewOrder extends NewOrder {
+public class LSENewOrder extends LSEMessage {
 	static final int SIZE = 97;
-	public LSENewOrder() {
-		super( Endianness.LITTLE, SIZE);
-	}
 	
-	@Override	
-	public void decode( byte bb[]) throws Exception {
-		super.decode( bb);
+	public String clOrdID;
+	public byte side;
+	public int quantity;
+	
+	public LSENewOrder( byte[] bb) {
+		super( bb, SIZE);
 		
 		this.clOrdID = decodeString( 4, 20);
 		this.instrumentID = decodeInt32( 46);
@@ -19,7 +19,11 @@ public class LSENewOrder extends NewOrder {
 	
 	@Override
 	public String toString() {
-		return super.toString() + ", instrumentID=" + this.instrumentID + ", price=" + this.price;
+		return "LSE New Order, instrumentID=" + this.instrumentID 
+				+ ", side=" + this.side
+				+ ", price=" + (this.price / 100000000)
+				+ ", quantity=" + this.quantity
+				;
 	}
 	
 	public int instrumentID;

@@ -1,16 +1,28 @@
 package executor;
 
-public class LSEExecutionReport extends ExecutionReport {
+public class LSEExecutionReport extends LSEMessage {
+	public static int SIZE = 151;
+	
+	protected int seqNum;
+	
+	protected byte side;
+	protected String clOrdID;
+	protected int quantity;
+	protected String orderID;
+	protected String execID;
+	
+	protected int instrumentID;
+	protected long executedPrice;
+	protected byte status;
+	
 	public LSEExecutionReport() {
-		super( Endianness.LITTLE, 151);
+		super( SIZE, '8');
 	}
 	
+	/**
+	 * Encode the rest of the message
+	 */
 	public void encode() {
-		super.encode();
-		
-		encode( (byte)2, 0);
-		encode( (short)151, 1);
-		encode( (byte)'8', 3);
 		// Client Order ID 20@21
 		encode( this.clOrdID, 21, 20);
 		
@@ -35,7 +47,7 @@ public class LSEExecutionReport extends ExecutionReport {
 		
 		// Order Reject Code 4@67 ignored
 		
-		// ExecutedPrice 8@71 TODO read from order
+		// ExecutedPrice 8@71
 		long executedPrice = this.executedPrice;
 		encode( executedPrice, 71);
 		
@@ -76,22 +88,19 @@ public class LSEExecutionReport extends ExecutionReport {
 		// 12@139
 	}
 	
-	@Override
-	public void populate( NewOrder no) {
-		super.populate(no);
-		if( no instanceof LSENewOrder) {
-			LSENewOrder lno = (LSENewOrder)no;
-			this.instrumentID = lno.instrumentID;
-			this.executedPrice = lno.price;
-		}
+	/**
+	 * Retrieve information from the order
+	 * @param no
+	 */
+	public void populate( LSENewOrder no) {
+		this.instrumentID = no.instrumentID;
+		this.executedPrice = no.price;
 	}
 	
 	@Override
 	public String toString() {
-		return super.toString() + ", instrumentID=" + this.instrumentID + ", executedPrice=" + this.executedPrice + ", status=" + this.status;
+		return "LSE Execution Report, instrumentID=" + this.instrumentID 
+				+ ", executedPrice=" + (this.executedPrice / 100000000) 
+				+ ", status=" + this.status;
 	}
-	
-	protected int instrumentID;
-	protected long executedPrice;
-	protected byte status;
 }

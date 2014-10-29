@@ -3,7 +3,7 @@ package executor;
 
 public class LSE extends Exchange {
 	public LSE() {
-		super( "LSE", 10003, new LSEExecutionReport(), new LSENewOrder());
+		super( "LSE", 10003);
 	}
 
 	@Override
@@ -24,11 +24,10 @@ public class LSE extends Exchange {
 		case 'D': // New Order
 			if( bufferSize < LSENewOrder.SIZE) return null;
 			try {
-				this.newOrder.decode( inputBuffer);
+				return new LSENewOrder(inputBuffer);
 			} catch( Exception e) {
-				
+				return null;
 			}
-			return this.newOrder;
 			
 		case 'A': // Logon
 			if( bufferSize < LSELogonMessage.SIZE) return null;

@@ -3,9 +3,26 @@ package executor;
 import java.util.Arrays;
 
 public class Message {
+	/**
+	 * Construct from scratch
+	 * @param e
+	 * @param size
+	 */
 	public Message( Endianness e, int size) {
 		this.size = size;
 		this.bytes = new byte[size];
+		this.endiannes = e;
+	}
+
+	/**
+	 * Construct from bytes
+	 * @param bb
+	 * @param e
+	 * @param size
+	 */
+	public Message(byte[] bb, Endianness e, int size) {
+		this.size = size;
+		this.bytes = bb;
 		this.endiannes = e;
 	}
 

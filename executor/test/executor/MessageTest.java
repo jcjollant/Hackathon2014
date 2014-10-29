@@ -16,19 +16,19 @@ public class MessageTest {
 		int testValue = 0x01234567;
 		
 		msgL.encode( testValue, 0);
-		assertEquals( (byte)0x01, msgL.getByte(3));
-		assertEquals( (byte)0x23, msgL.getByte(2));
-		assertEquals( (byte)0x45, msgL.getByte(1));
 		assertEquals( (byte)0x67, msgL.getByte(0));
+		assertEquals( (byte)0x45, msgL.getByte(1));
+		assertEquals( (byte)0x23, msgL.getByte(2));
+		assertEquals( (byte)0x01, msgL.getByte(3));
 		
 		int decodedValue = msgL.decodeInt32(0);
 		assertEquals( testValue, decodedValue);
 		
 		msgB.encode( testValue, 0);
-		assertEquals( (byte)0x67, msgB.getByte(3));
-		assertEquals( (byte)0x45, msgB.getByte(2));
-		assertEquals( (byte)0x23, msgB.getByte(1));
 		assertEquals( (byte)0x01, msgB.getByte(0));
+		assertEquals( (byte)0x23, msgB.getByte(1));
+		assertEquals( (byte)0x45, msgB.getByte(2));
+		assertEquals( (byte)0x67, msgB.getByte(3));
 		
 		decodedValue = msgB.decodeInt32(0);
 		assertEquals( testValue, decodedValue);
@@ -36,19 +36,19 @@ public class MessageTest {
 		testValue = 0xFEDCBA98;
 		
 		msgL.encode( testValue, 0);
-		assertEquals( (byte)0xFE, msgL.getByte(3));
-		assertEquals( (byte)0xDC, msgL.getByte(2));
-		assertEquals( (byte)0xBA, msgL.getByte(1));
 		assertEquals( (byte)0x98, msgL.getByte(0));
+		assertEquals( (byte)0xBA, msgL.getByte(1));
+		assertEquals( (byte)0xDC, msgL.getByte(2));
+		assertEquals( (byte)0xFE, msgL.getByte(3));
 		
 		decodedValue = msgL.decodeInt32(0);
 		assertEquals( testValue, decodedValue);
 		
 		msgB.encode( testValue, 0);
-		assertEquals( (byte)0x98, msgB.getByte(3));
-		assertEquals( (byte)0xBA, msgB.getByte(2));
-		assertEquals( (byte)0xDC, msgB.getByte(1));
 		assertEquals( (byte)0xFE, msgB.getByte(0));
+		assertEquals( (byte)0xDC, msgB.getByte(1));
+		assertEquals( (byte)0xBA, msgB.getByte(2));
+		assertEquals( (byte)0x98, msgB.getByte(3));
 		
 		decodedValue = msgB.decodeInt32(0);
 		assertEquals( testValue, decodedValue);
