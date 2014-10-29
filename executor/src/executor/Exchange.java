@@ -10,15 +10,10 @@ public abstract class Exchange extends Thread {
 	public Exchange( String name, int port, ExecutionReport er, NewOrder no) {
 		this.name = name;
 		this.port = port;
-		this.executionReport = er;
 		this.newOrder = no;
 		this.serverSocket = null;
 	}
 
-	protected void finalize() throws Throwable {
-		if( this.serverSocket != null) this.serverSocket.close();
-	}
-	
 	@Override
 	public void run() {
 		
@@ -63,64 +58,50 @@ public abstract class Exchange extends Thread {
 					while( ( bufferSize += is.read( inputBuffer)) != -1 ) {
 						// do we have enough to read the full message?
 						if( ( msg = this.getMessage( inputBuffer, bufferSize)) == null) continue;
+						System.out.println( this.name + " Message received : " + msg.toString());
+						System.out.println( Display.bytesToHex( msg.getBytes(), msg.getSize()));
 						
 						// copy remainder to the beginning of the buffer
 						System.arraycopy( inputBuffer, msg.getSize(), inputBuffer, 0, bufferSize - msg.getSize());
 						bufferSize -= msg.getSize();
 						
-						// send proper response
-						if( msg.isNewOrder()) {
-							
-							System.out.println( this.name + " Received New Order (" + bufferSize + " bytes)");
-							this.newOrder.decode( inputBuffer);
-							System.out.println( this.name + " Order: " + this.newOrder.toString());
-							System.out.println( Display.bytesToHex( inputBuffer, bufferSize));
-							
-							try {
-								this.executionReport.populate( this.newOrder);
-								this.executionReport.encode();
-							} catch( Exception e) {
-								System.out.println( "Could not encode response because " + e.getMessage());
-							}
-						} else if( msg.isLogon()) {
-							response = msg;
-						}
+						// Do we have a response to this incoming message?
+						if( ( response = getResponse( msg)) == null ) continue;
 						
-						if( response != null) {
-							// send the response
-							try {
-								byte bb[] = response.getBytes();
-								os.write( bb);
-								System.out.println( this.name + " Sent Response (" + bb.length + " bytes)");
-								System.out.println( this.name + " Message: " + this.executionReport.toString());
-								System.out.println( Display.bytesToHex(bb, bb.length));
-								Thread.sleep( 1000);
-								clientSocket.close();
-								response = null;
-							} catch(IOException ioe) {
-								System.out.println("Could not send response because " + ioe.getMessage());
-								break;
-							}
-							
+						// send the response
+						try {
+							byte bb[] = response.getBytes();
+							os.write( bb);
+							System.out.println( this.name + " Response Sent : " + response.toString());
+							System.out.println( Display.bytesToHex(bb, response.getSize()));
+						} catch(IOException ioe) {
+							System.out.println("Could not send response because " + ioe.getMessage());
+							break;
 						}
+							
 					}
 				} catch( Exception e) {
-					System.out.println( "Could not process order because " + e.getMessage() );
+					System.out.println( this.name + " Could not process message because " + e.getMessage() );
 					break;
 				}
 			}
 			
+			try {
+				this.serverSocket.close();
+			} catch( Exception e) {
+				
+			}
 			
 		}
 	}
 
-	abstract Message getMessage(byte[] inputBuffer, int bufferSize);
-
 	abstract int getHeaderSize();
+	abstract Message getMessage(byte[] inputBuffer, int bufferSize);
+	abstract Message getResponse( Message msg);
+
 
 	private String name;
 	private int port;
-	private ExecutionReport executionReport;
 	protected NewOrder newOrder;
 	private ServerSocket serverSocket;
 }

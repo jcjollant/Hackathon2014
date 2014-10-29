@@ -18,4 +18,10 @@ public class NYSE extends Exchange {
 		return null;
 	}
 
+	@Override
+	Message getResponse(Message msg) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

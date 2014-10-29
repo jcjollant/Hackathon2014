@@ -15,20 +15,45 @@ public class LSE extends Exchange {
 	Message getMessage(byte[] inputBuffer, int bufferSize) {
 		if( bufferSize < getHeaderSize()) return null;
 		
-		if( inputBuffer[3] == 'D') {
-			if( bufferSize < this.newOrder.getSize()) return null;
+		// create proper message base on type
+		switch( inputBuffer[3]) {
+		case '0': // heartbeat
+			if( bufferSize < LSEHeartbeat.SIZE) return null;
+			return new LSEHeartbeat();
+			
+		case 'D': // New Order
+			if( bufferSize < LSENewOrder.SIZE) return null;
 			try {
 				this.newOrder.decode( inputBuffer);
 			} catch( Exception e) {
 				
 			}
 			return this.newOrder;
-		} else if( inputBuffer[3] == 'A') {
-			Message output = new LSELogonMessage( inputBuffer);
-			if( bufferSize < output.getSize()) return null;
-			return output;
+			
+		case 'A': // Logon
+			if( bufferSize < LSELogonMessage.SIZE) return null;
+			return new LSELogonMessage( inputBuffer);
+			
+		default:
+			return null;
 		}
 
+	}
+
+	@Override
+	Message getResponse(Message msg) {
+		if( msg instanceof LSENewOrder) {
+			LSEExecutionReport er = new LSEExecutionReport();
+			er.populate( ( LSENewOrder)msg);
+			return er;
+		} else if ( msg instanceof LSELogonMessage) {
+			LSELogonReply lr = new LSELogonReply();
+			return lr;
+		} else if ( msg instanceof LSEHeartbeat) {
+			// hearbeats are identical
+			return (LSEHeartbeat)msg;
+		}
+		
 		return null;
 	}
 
