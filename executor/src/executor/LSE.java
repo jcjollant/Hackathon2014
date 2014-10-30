@@ -50,7 +50,7 @@ public class LSE extends Exchange {
 			return lr;
 		} else if ( msg instanceof LSEHeartbeat) {
 			// hearbeats are identical
-			return (LSEHeartbeat)msg;
+			return null;//(LSEHeartbeat)msg;
 		}
 		
 		return null;

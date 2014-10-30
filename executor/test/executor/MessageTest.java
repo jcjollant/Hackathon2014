@@ -10,6 +10,43 @@ import executor.Message;
 public class MessageTest {
 
 	@Test
+	public void test16() {
+		Message msgL = new Message( Endianness.LITTLE, 2);
+		Message msgB = new Message( Endianness.BIG, 2);
+		short testValue = 0x0123;
+		
+		msgL.encode( testValue, 0);
+		assertEquals( (byte)0x23, msgL.getByte(0));
+		assertEquals( (byte)0x01, msgL.getByte(1));
+		
+		int decodedValue = msgL.decodeInt16(0);
+		assertEquals( testValue, decodedValue);
+		
+		msgB.encode( testValue, 0);
+		assertEquals( (byte)0x01, msgB.getByte(0));
+		assertEquals( (byte)0x23, msgB.getByte(1));
+		
+		decodedValue = msgB.decodeInt16(0);
+		assertEquals( testValue, decodedValue);
+		
+		testValue = (short)0xFEDC;
+		
+		msgL.encode( testValue, 0);
+		assertEquals( (byte)0xDC, msgL.getByte(0));
+		assertEquals( (byte)0xFE, msgL.getByte(1));
+		
+		decodedValue = msgL.decodeInt16(0);
+		assertEquals( testValue, decodedValue);
+		
+		msgB.encode( testValue, 0);
+		assertEquals( (byte)0xFE, msgB.getByte(0));
+		assertEquals( (byte)0xDC, msgB.getByte(1));
+		
+		decodedValue = msgB.decodeInt16(0);
+		assertEquals( testValue, decodedValue);
+	}
+	
+	@Test
 	public void test32() {
 		Message msgL = new Message( Endianness.LITTLE, 4);
 		Message msgB = new Message( Endianness.BIG, 4);

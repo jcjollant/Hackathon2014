@@ -26,6 +26,23 @@ public class Message {
 		this.endiannes = e;
 	}
 
+	public byte decodeInt8( int position) {
+		return (byte)(this.bytes[position] & 0xFF);
+	}
+
+	public short decodeInt16(int position) {
+		short val = 0;
+		if( this.endiannes == Endianness.BIG) {
+			val += ( short)(this.bytes[  position] & 0xFF) << 8;
+			val += ( short)(this.bytes[++position] & 0xFF);
+		} else {
+			val += ( short)(this.bytes[  position] & 0xFF);
+			val += ( short)(this.bytes[++position] & 0xFF) << 8;
+		}
+
+		return val;
+	}
+	
 	public int decodeInt32( int position) {
 		int val = 0;
 		if( this.endiannes == Endianness.BIG) {
@@ -66,10 +83,6 @@ public class Message {
 		return val;
 	}
 
-	public byte decodeInt8( int position) {
-		return (byte)(this.bytes[position] & 0xFF);
-	}
-
 	public String decodeString( int position, int length) {
 		// look for the first 0 before length
 		int index = position;
@@ -88,11 +101,11 @@ public class Message {
 	
 	public int encode( short val, int position) { 
 		if( this.endiannes == Endianness.BIG) {
-			this.bytes[position] = (byte)( val & 0xFF);
-			this.bytes[++position] = (byte)((val & 0xFF00) >> 8);
-		} else {
-			this.bytes[position] = (byte)((val & 0xFF00) >> 8);
+			this.bytes[  position] = (byte)((val & 0xFF00) >> 8);
 			this.bytes[++position] = (byte)( val & 0xFF);
+		} else {
+			this.bytes[  position] = (byte)( val & 0xFF);
+			this.bytes[++position] = (byte)((val & 0xFF00) >> 8);
 		}
 		return position + 2;
 	}
@@ -180,4 +193,5 @@ public class Message {
 	public boolean isLogon() {
 		return false;
 	}
+
 }

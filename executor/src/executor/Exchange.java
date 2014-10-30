@@ -86,6 +86,7 @@ public abstract class Exchange extends Thread {
 			}
 			
 			try {
+				System.out.println( "Closing server socket");
 				this.serverSocket.close();
 			} catch( Exception e) {
 				
