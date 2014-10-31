@@ -44,13 +44,14 @@ public class LSE extends Exchange {
 		if( msg instanceof LSENewOrder) {
 			LSEExecutionReport er = new LSEExecutionReport();
 			er.populate( ( LSENewOrder)msg);
+			er.encode();
 			return er;
 		} else if ( msg instanceof LSELogonMessage) {
 			LSELogonReply lr = new LSELogonReply();
 			return lr;
 		} else if ( msg instanceof LSEHeartbeat) {
-			// hearbeats are identical
-			return null;//(LSEHeartbeat)msg;
+			// hearbeats are identical just resend inbound msg
+			return (LSEHeartbeat)msg;
 		}
 		
 		return null;

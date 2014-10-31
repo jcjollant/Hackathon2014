@@ -93,8 +93,10 @@ public class LSEExecutionReport extends LSEMessage {
 	 * @param no
 	 */
 	public void populate( LSENewOrder no) {
+		this.clOrdID = no.clOrdID;
 		this.instrumentID = no.instrumentID;
 		this.executedPrice = no.price;
+		this.side = no.side;
 	}
 	
 	@Override

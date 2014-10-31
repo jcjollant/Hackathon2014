@@ -57,7 +57,7 @@ public abstract class Exchange extends Thread {
 					while( ( bufferSize += is.read( inputBuffer)) != -1 ) {
 						// do we have enough to read the full message?
 						if( ( msg = this.getMessage( inputBuffer, bufferSize)) == null) continue;
-						System.out.println( this.name + " Message received : " + msg.toString());
+						System.out.println( "[" + System.currentTimeMillis() + "] " + this.name + " Message received : " + msg.toString());
 						System.out.println( Display.bytesToHex( msg.getBytes(), msg.getSize()));
 						
 						// copy remainder to the beginning of the buffer
@@ -71,7 +71,7 @@ public abstract class Exchange extends Thread {
 						try {
 							byte bb[] = response.getBytes();
 							os.write( bb);
-							System.out.println( this.name + " Response Sent : " + response.toString());
+							System.out.println( "[" + System.currentTimeMillis() + "] " + this.name + " Response Sent : " + response.toString());
 							System.out.println( Display.bytesToHex(bb, response.getSize()));
 						} catch(IOException ioe) {
 							System.out.println("Could not send response because " + ioe.getMessage());
