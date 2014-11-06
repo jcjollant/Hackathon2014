@@ -23,6 +23,10 @@ public class LSEExecutionReport extends LSEMessage {
 	 * Encode the rest of the message
 	 */
 	public void encode() {
+		// Execution ID
+		this.execID = Display.randomString(12);
+		encode( this.execID, 9, 12);
+		
 		// Client Order ID 20@21
 		encode( this.clOrdID, 21, 20);
 		
@@ -34,8 +38,6 @@ public class LSEExecutionReport extends LSEMessage {
 		encode( (byte)'F', 53);
 		
 		// Execution Report RefID 12@54
-		this.execID = Display.randomString(12);
-		encode( this.execID, 54, 12);
 		
 		// OrdStatus 1@66 always filled=2
 		if( this.quantity == 666) {
@@ -102,7 +104,11 @@ public class LSEExecutionReport extends LSEMessage {
 	@Override
 	public String toString() {
 		return "LSE Execution Report, instrumentID=" + this.instrumentID 
+				+ ", clOrdID=" + this.clOrdID 
+				+ ", ordID=" + this.orderID 
+				+ ", execID=" + this.execID 
 				+ ", executedPrice=" + (this.executedPrice / 100000000) 
+				+ ", side=" + this.side 
 				+ ", status=" + this.status;
 	}
 }

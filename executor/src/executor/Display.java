@@ -66,7 +66,7 @@ public static String bytesToHex( byte[] bytes, int length) {
 }
 
 public static String randomString( int length) {
-	char[] chars = "0123456789".toCharArray();
+	char[] chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 	StringBuilder sb = new StringBuilder();
 	Random random = new Random();
 	for (int i = 0; i < length; i++) {
